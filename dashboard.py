@@ -43,11 +43,11 @@ app.layout = html.Div([
                 options=[{'label': i, 'value': i} for i in available_features],
                 value='EXT_SOURCE_1'
             ),
-            dcc.RangeSlider(
-                id='x-range-slider',
+            dcc.Slider(
+                id='xy-range-slider',
                 min=0,
-                max=20,
-                value=[5, 15]
+                max=50,
+                value=5
             )
 
         ],
@@ -58,12 +58,6 @@ app.layout = html.Div([
                 id='yaxis-column',
                 options=[{'label': i, 'value': i} for i in available_features],
                 value='EXT_SOURCE_2'
-            ),
-            dcc.RangeSlider(
-                id='y-range-slider',
-                min=0,
-                max=20,
-                value=[5, 15]
             )
         ],style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
@@ -77,13 +71,18 @@ app.layout = html.Div([
     Output('indicator-graphic', 'figure'),
     [Input('xaxis-column', 'value'),
      Input('yaxis-column', 'value'),
-     Input('x-range-slider', 'value'),
-     Input('y-range-slider', 'value')])
+     Input('xy-range-slider', 'value')])
 def update_graph(xaxis_column_name, yaxis_column_name,
-                 xrangeValues, yrangeValues):
+                 xyrangeValues):
     dff = df[[xaxis_column_name, yaxis_column_name, 'TARGET']].dropna()
-    dff = dff[(dff[xaxis_column_name] > 0.1) & (dff[xaxis_column_name] < 0.2)]
-    dff = dff[(dff[yaxis_column_name] > 0.7) & (dff[yaxis_column_name] < 0.9)]
+    RangeX = xyrangeValues*(dff[xaxis_column_name].max()-dff[xaxis_column_name].min())/100
+    RangeY = xyrangeValues*(dff[yaxis_column_name].max()-dff[yaxis_column_name].min())/100
+    ValX = 0.2
+    ValY = 0.74
+    dff = dff[(dff[xaxis_column_name] > ValX-RangeX) & \
+              (dff[xaxis_column_name] < ValX+RangeX)]
+    dff = dff[(dff[yaxis_column_name] > ValY-RangeY) & \
+              (dff[yaxis_column_name] < ValY+RangeY)]
 
     fig = px.scatter(x=dff[dff['TARGET'] == 1][xaxis_column_name],
                      y=dff[dff['TARGET'] == 1][yaxis_column_name],
