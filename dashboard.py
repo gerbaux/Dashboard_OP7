@@ -42,7 +42,14 @@ app.layout = html.Div([
                 id='xaxis-column',
                 options=[{'label': i, 'value': i} for i in available_features],
                 value='EXT_SOURCE_1'
+            ),
+            dcc.RangeSlider(
+                id='x-range-slider',
+                min=0,
+                max=20,
+                value=[5, 15]
             )
+
         ],
         style={'width': '48%', 'display': 'inline-block'}),
 
@@ -52,33 +59,28 @@ app.layout = html.Div([
                 options=[{'label': i, 'value': i} for i in available_features],
                 value='EXT_SOURCE_2'
             ),
-            dcc.RadioItems(
-                id='yaxis-type',
-                options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-                value='Linear',
-                labelStyle={'display': 'inline-block'}
+            dcc.RangeSlider(
+                id='y-range-slider',
+                min=0,
+                max=20,
+                value=[5, 15]
             )
         ],style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
 
-    dcc.Graph(id='indicator-graphic'),
+    dcc.Graph(id='indicator-graphic')
 
-    # dcc.Slider(
-        # id='year--slider',
-        # min=df['Year'].min(),
-        # max=df['Year'].max(),
-        # value=df['Year'].max(),
-        # step=None
-    # )
+#    html.Div(id='output-container-range-slider')
 ])
 
 @app.callback(
     Output('indicator-graphic', 'figure'),
     [Input('xaxis-column', 'value'),
      Input('yaxis-column', 'value'),
-     Input('yaxis-type', 'value')])
+     Input('x-range-slider', 'value'),
+     Input('y-range-slider', 'value')])
 def update_graph(xaxis_column_name, yaxis_column_name,
-                 yaxis_type):
+                 xrangeValues, yrangeValues):
     dff = df[[xaxis_column_name, yaxis_column_name, 'TARGET']].dropna()
     dff = dff[(dff[xaxis_column_name] > 0.1) & (dff[xaxis_column_name] < 0.2)]
     dff = dff[(dff[yaxis_column_name] > 0.7) & (dff[yaxis_column_name] < 0.9)]
