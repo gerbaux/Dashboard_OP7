@@ -36,6 +36,9 @@ available_features = df.columns
 
 app.layout = html.Div([
     html.Div([
+        html.H6("Customer Selection"),
+        html.Div(["Id: ",
+              dcc.Input(id='customer-id', value='0', type='number')]),
 
         html.Div([
             dcc.Dropdown(
@@ -71,14 +74,15 @@ app.layout = html.Div([
     Output('indicator-graphic', 'figure'),
     [Input('xaxis-column', 'value'),
      Input('yaxis-column', 'value'),
-     Input('xy-range-slider', 'value')])
+     Input('xy-range-slider', 'value'),
+     Input('customer-id', 'value')])
 def update_graph(xaxis_column_name, yaxis_column_name,
-                 xyrangeValues):
+                 xyrangeValues, customerId):
     dff = df[[xaxis_column_name, yaxis_column_name, 'TARGET']].dropna()
     RangeX = xyrangeValues*(dff[xaxis_column_name].max()-dff[xaxis_column_name].min())/100
     RangeY = xyrangeValues*(dff[yaxis_column_name].max()-dff[yaxis_column_name].min())/100
-    ValX = 0.2
-    ValY = 0.74
+    ValX = dff.iloc[customerId][xaxis_column_name]
+    ValY = dff.iloc[customerId][yaxis_column_name]
     dff = dff[(dff[xaxis_column_name] > ValX-RangeX) & \
               (dff[xaxis_column_name] < ValX+RangeX)]
     dff = dff[(dff[yaxis_column_name] > ValY-RangeY) & \
