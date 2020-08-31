@@ -6,6 +6,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.express as px
+import plotly.graph_objects as go
 import pandas as pd
 import gc
 import json
@@ -38,7 +39,7 @@ app.layout = html.Div([
     html.Div([
         html.H6("Customer Selection"),
         html.Div(["Id: ",
-              dcc.Input(id='customer-id', value='0', type='number')]),
+              dcc.Input(id='customer-id', value=0, type='number')]),
 
         html.Div([
             dcc.Dropdown(
@@ -49,8 +50,8 @@ app.layout = html.Div([
             dcc.Slider(
                 id='xy-range-slider',
                 min=0,
-                max=50,
-                value=5
+                max=100,
+                value=20
             )
 
         ],
@@ -88,9 +89,19 @@ def update_graph(xaxis_column_name, yaxis_column_name,
     dff = dff[(dff[yaxis_column_name] > ValY-RangeY) & \
               (dff[yaxis_column_name] < ValY+RangeY)]
 
-    fig = px.scatter(x=dff[dff['TARGET'] == 1][xaxis_column_name],
+    fig = go.Figure(data = go.Scatter(x=dff[dff['TARGET'] == 1][xaxis_column_name],
                      y=dff[dff['TARGET'] == 1][yaxis_column_name],
-                     color=dff[dff['TARGET'] == 1]['TARGET'])
+                     mode='markers',
+                     marker=dict(size=6, color='red'),
+                     name='Default'))
+    fig.add_trace(go.Scatter(x=dff[dff['TARGET'] == 0][xaxis_column_name],
+                     y=dff[dff['TARGET'] == 0][yaxis_column_name],
+                     mode='markers',
+                     marker=dict(size=6, color='green'),
+                     name='Success'))
+    fig.add_trace(go.Scatter(x=[ValX], y=[ValY], mode='markers',
+                             marker=dict(size=15, color='black'),
+                             name='Customer'))
 
     fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
 
