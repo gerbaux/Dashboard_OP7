@@ -86,6 +86,18 @@ def update_graph(xaxis_column_name,
     fig = ff.create_distplot(hist_data, group_labels,
                              show_hist=False, colors=colors,
                              show_rug=False)
+    fig.update_layout(shapes=[
+        dict(
+            type= 'line',
+            yref= 'paper', 
+            y0= dff[xaxis_column_name].min(), 
+            y1= dff[xaxis_column_name].max(),
+            xref= 'x', 
+            x0= dff.iloc[customerId][xaxis_column_name], 
+            x1= dff.iloc[customerId][xaxis_column_name],
+        )]
+    )
+    
     return fig
 
 @app.callback(
