@@ -75,11 +75,10 @@ app.layout = html.Div([
 @app.callback(
     Output('indicator-graphic2', 'figure'),
     [Input('xaxis-column', 'value'),
-     Input('yaxis-column', 'value'),
      Input('customer-id', 'value')])
-def update_graph(xaxis_column_name, yaxis_column_name,
+def update_graph(xaxis_column_name,
                  customerId):
-    dff = df[[xaxis_column_name, yaxis_column_name, 'TARGET']].dropna()
+    dff = df[[xaxis_column_name, 'TARGET']].dropna()
     hist_data = [dff[dff['TARGET'] == 1][xaxis_column_name], \
                  dff[dff['TARGET'] == 0][xaxis_column_name]]
     group_labels = ['Default', 'Success']
