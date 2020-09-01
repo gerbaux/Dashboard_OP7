@@ -7,6 +7,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.figure_factory as ff
 import pandas as pd
 import gc
 import json
@@ -66,10 +67,27 @@ app.layout = html.Div([
         ],style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
 
-    dcc.Graph(id='indicator-graphic')
+    dcc.Graph(id='indicator-graphic'),
 
-#    html.Div(id='output-container-range-slider')
+   dcc.Graph(id='indicator-graphic2')
 ])
+
+@app.callback(
+    Output('indicator-graphic2', 'figure'),
+    [Input('xaxis-column', 'value'),
+     Input('yaxis-column', 'value'),
+     Input('customer-id', 'value')])
+def update_graph(xaxis_column_name, yaxis_column_name,
+                 customerId):
+    dff = df[[xaxis_column_name, yaxis_column_name, 'TARGET']].dropna()
+    hist_data = [dff[dff['TARGET'] == 1][xaxis_column_name], \
+                 dff[dff['TARGET'] == 0][xaxis_column_name]]
+    group_labels = ['Default', 'Success']
+    colors = ['red', 'green']
+    fig = ff.create_distplot(hist_data, group_labels,
+                             show_hist=False, colors=colors,
+                             show_rug=False)
+    return fig
 
 @app.callback(
     Output('indicator-graphic', 'figure'),
