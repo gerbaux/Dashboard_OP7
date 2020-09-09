@@ -6,6 +6,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.express as px
+import numpy as np
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import pandas as pd
@@ -17,7 +18,8 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
-df = pd.read_csv("df10Kx20.csv")
+DashBoardDF = pd.read_csv("featureDF1K.csv")
+shapValues1 = np.load("shapValues1K.npy")
 
 # with open('dtypes.txt') as json_file:
     # dtypesR = json.load(json_file)
@@ -34,7 +36,7 @@ df = pd.read_csv("df10Kx20.csv")
 # del testDF
 # gc.collect()
 
-available_features = df.columns
+available_features = DashBoardDF.columns
 
 app.layout = html.Div([
     html.Div([
@@ -78,9 +80,9 @@ app.layout = html.Div([
      Input('customer-id', 'value')])
 def update_graph(xaxis_column_name,
                  customerId):
-    dff = df[[xaxis_column_name, 'TARGET']].dropna()
-    hist_data = [dff[dff['TARGET'] == 1][xaxis_column_name], \
-                 dff[dff['TARGET'] == 0][xaxis_column_name]]
+    dff = DashBoardDF[[xaxis_column_name, 'Predict']].dropna()
+    hist_data = [dff[dff['Predict'] == 1][xaxis_column_name], \
+                 dff[dff['Predict'] == 0][xaxis_column_name]]
     group_labels = ['Default', 'Success']
     colors = ['red', 'blue']
     fig = ff.create_distplot(hist_data, group_labels,
@@ -108,7 +110,7 @@ def update_graph(xaxis_column_name,
      Input('customer-id', 'value')])
 def update_graph(xaxis_column_name, yaxis_column_name,
                  xyrangeValues, customerId):
-    dff = df[[xaxis_column_name, yaxis_column_name, 'TARGET']].dropna()
+    dff = DashBoardDF[[xaxis_column_name, yaxis_column_name, 'Predict']].dropna()
     RangeX = xyrangeValues*(dff[xaxis_column_name].max()-dff[xaxis_column_name].min())/100
     RangeY = xyrangeValues*(dff[yaxis_column_name].max()-dff[yaxis_column_name].min())/100
     ValX = dff.iloc[customerId][xaxis_column_name]
@@ -118,13 +120,13 @@ def update_graph(xaxis_column_name, yaxis_column_name,
     dff = dff[(dff[yaxis_column_name] > ValY-RangeY) & \
               (dff[yaxis_column_name] < ValY+RangeY)]
 
-    fig = go.Figure(data = go.Scatter(x=dff[dff['TARGET'] == 1][xaxis_column_name],
-                     y=dff[dff['TARGET'] == 1][yaxis_column_name],
+    fig = go.Figure(data = go.Scatter(x=dff[dff['Predict'] == 1][xaxis_column_name],
+                     y=dff[dff['Predict'] == 1][yaxis_column_name],
                      mode='markers',
                      marker=dict(size=6, color='red'),
                      name='Default'))
-    fig.add_trace(go.Scatter(x=dff[dff['TARGET'] == 0][xaxis_column_name],
-                     y=dff[dff['TARGET'] == 0][yaxis_column_name],
+    fig.add_trace(go.Scatter(x=dff[dff['Predict'] == 0][xaxis_column_name],
+                     y=dff[dff['Predict'] == 0][yaxis_column_name],
                      mode='markers',
                      marker=dict(size=6, color='blue'),
                      name='Success'))
