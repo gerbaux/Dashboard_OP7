@@ -18,6 +18,9 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
+# load model
+lGBMclf = joblib.load('LGBM_BestNF.pkl')
+
 DashBoardDF = pd.read_csv("featureDF1K.csv")
 shapValues1 = np.load("shapValues1K.npy")
 
@@ -38,11 +41,30 @@ shapValues1 = np.load("shapValues1K.npy")
 
 available_features = DashBoardDF.columns
 
+
+def sortSecond(val):
+    return val[1]
+
+NbFeatures = 12
+listFeaturesI = [(x, int(y)) for x,y in zip(DashBoardDF.columns,lGBMclf.feature_importances_)]
+listFeaturesI.sort(key = sortSecond, reverse=True)
+
+# Coefficient Figure
+coef_fig = px.bar(
+    y=[x[0] for x in reversed(listFeaturesI[:NbFeatures])],
+    x=[x[1] for x in reversed(listFeaturesI[:NbFeatures])],
+    orientation="h",
+#    color=X_test.columns.isin(num_cols),
+    labels={"color": "Is numerical", "x": "Weight on Prediction", "y": "Features"},
+    title="Feature importance",
+)
+
 app.layout = html.Div([
     html.Div([
         html.H6("Customer Selection"),
         html.Div(["Id: ",
-              dcc.Input(id='customer-id', value=0, type='number')]),
+              dcc.Input(id='customer-id', value=0, type='number'),
+              dcc.Graph(figure=coef_fig)]),
 
         html.Div([
             dcc.Dropdown(
@@ -72,6 +94,7 @@ app.layout = html.Div([
     dcc.Graph(id='indicator-graphic'),
 
    dcc.Graph(id='indicator-graphic2')
+
 ])
 
 @app.callback(
