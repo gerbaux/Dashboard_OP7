@@ -82,7 +82,7 @@ def update_graph(xaxis_column_name,
     hist_data = [dff[dff['TARGET'] == 1][xaxis_column_name], \
                  dff[dff['TARGET'] == 0][xaxis_column_name]]
     group_labels = ['Default', 'Success']
-    colors = ['red', 'green']
+    colors = ['red', 'blue']
     fig = ff.create_distplot(hist_data, group_labels,
                              show_hist=False, colors=colors,
                              show_rug=False)
@@ -126,7 +126,7 @@ def update_graph(xaxis_column_name, yaxis_column_name,
     fig.add_trace(go.Scatter(x=dff[dff['TARGET'] == 0][xaxis_column_name],
                      y=dff[dff['TARGET'] == 0][yaxis_column_name],
                      mode='markers',
-                     marker=dict(size=6, color='green'),
+                     marker=dict(size=6, color='blue'),
                      name='Success'))
     fig.add_trace(go.Scatter(x=[ValX], y=[ValY], mode='markers',
                              marker=dict(size=15, color='black'),
