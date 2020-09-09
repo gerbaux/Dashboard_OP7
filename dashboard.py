@@ -117,12 +117,15 @@ app.layout = html.Div([
     ]),
 
     dcc.Graph(id='indicator-graphic'),
-    dcc.Slider(
+    html.Div(["Zoom: ",
+        dcc.Slider(
                 id='xy-range-slider',
                 min=0,
                 max=100,
                 value=20
-    ),
+        ),
+             ],
+             style={'width': '48%', 'display': 'inline-block'}),
 ])
 
 @app.callback(
