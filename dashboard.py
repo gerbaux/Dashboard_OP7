@@ -41,6 +41,20 @@ shapValues1 = np.load("shapValues1K.npy")
 
 available_features = DashBoardDF.columns
 
+def getCustomerFeatures(CustId, NbFeatures = 12):
+    maxFeatureId = sorted(range(len(shapValues1[CustId])),
+                          key=lambda x: abs(shapValues1[CustId][x]))[-NbFeatures:]
+    FeatureNames = np.empty(NbFeatures, dtype=object)
+    FeatureShapValues = np.empty(NbFeatures, dtype=float)
+    FeatureStdValues = np.empty(NbFeatures, dtype=float)
+    for i, Id in enumerate(maxFeatureId):
+        FeatureNames[i] = DashBoardDF.columns[Id]
+        FeatureShapValues[i] = shapValues1[CustId][Id]
+        FeatureStdValues[i] = DashBoardDF.iloc[CustId][Id]
+    positive = FeatureShapValues > 0
+    colors = list(map(lambda x: 'red' if x else 'blue', positive))
+    return (FeatureNames, FeatureShapValues, colors)
+
 
 def sortSecond(val):
     return val[1]
@@ -56,7 +70,7 @@ coef_fig = px.bar(
     orientation="h",
 #    color=X_test.columns.isin(num_cols),
     labels={"color": "Is numerical", "x": "Weight on Prediction", "y": "Features"},
-    title="Feature importance",
+    title="Global Feature Importance",
 )
 
 app.layout = html.Div([
@@ -65,7 +79,15 @@ app.layout = html.Div([
             html.H6("Customer Selection"),
             html.Div(["Id: ",
                   dcc.Input(id='customer-id', value=0, type='number')
-                  ]),
+                  ],
+                  style={'width': '48%', 'display': 'inline-block'}),
+                  html.Div(["Nb Features: ",
+                    dcc.Input(id='nb-features', value=12, type='number')
+                  ], style={'width': '48%', 'display': 'inline-block'}),
+                  html.Div([
+                    dcc.Graph(id='feature-graphic1')],
+                    style={'width': '90%', 'display': 'inline-block'}),
+
     ],
     style={'width': '48%', 'display': 'inline-block'}),
     html.Div([
@@ -103,6 +125,26 @@ app.layout = html.Div([
     dcc.Graph(id='indicator-graphic2')
 
 ])
+
+@app.callback(
+    Output('feature-graphic1', 'figure'),
+    [Input('nb-features', 'value'),
+     Input('customer-id', 'value')])
+def update_graph(nbFeatures,
+                 customerId):
+    FeatureNames, FeatureShapValues, colors = getCustomerFeatures(customerId, nbFeatures)
+    cust_coef_fig = px.bar(
+        y=FeatureNames,
+        x=FeatureShapValues,
+        orientation="h",
+#        color=colors,
+        labels={"x": "Weight on Prediction", "y": "Features"},
+#        marker={'color' : colors},
+        title="Customer Feature Importance",
+    )
+
+    return cust_coef_fig
+
 
 @app.callback(
     Output('indicator-graphic2', 'figure'),
