@@ -88,6 +88,15 @@ coef_fig = px.bar(
     title="Global Feature Importance",
 )
 
+# Data for probability distribution
+NbBins = 500
+Threshold = 0.145
+dist = pd.cut(DashBoardDF['Proba'], bins=NbBins).value_counts()
+dist.sort_index(inplace=True)
+ticks = np.linspace(0, 1, NbBins)
+DashBoradTH=int(Threshold*len(dist))
+
+
 app.layout = html.Div([
     html.Div([
         html.Div([
@@ -109,6 +118,7 @@ app.layout = html.Div([
         dcc.Graph(figure=coef_fig),
     ],
     style={'width': '48%', 'display': 'inline-block'}),
+    dcc.Graph(id='proba-score'),
 
         html.Div([
             # dcc.Dropdown(
@@ -166,6 +176,28 @@ def update_graph(nbFeatures,
 
     return cust_coef_fig
 
+
+@app.callback(
+    Output('proba-score', 'figure'),
+    [Input('customer-id', 'value')])
+def update_graph(customerId):
+    fig = go.Figure(data = go.Scatter(x=ticks[:DashBoradTH],
+                                      y=dist[:DashBoradTH],
+                                      mode='lines',
+                                      marker=dict(color='blue'),
+                                      name='Success'))
+    fig.add_trace(go.Scatter(x=ticks[DashBoradTH:],
+                             y=dist[DashBoradTH:],
+                             mode='lines',
+                             marker=dict(color='red'),
+                             name='Default'))
+    Score = DashBoardDF.loc[customerId, 'Proba']
+    rank = int(Score*len(dist))-1
+    fig.add_trace(go.Scatter(x=[Score], y=[dist[rank]], mode='markers',
+                             marker=dict(size=15, color='black'),
+                             name='Customer'))
+
+    return fig
 
 @app.callback(
     Output('xaxis-distribution', 'figure'),
