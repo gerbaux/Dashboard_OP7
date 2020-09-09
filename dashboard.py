@@ -61,10 +61,17 @@ coef_fig = px.bar(
 
 app.layout = html.Div([
     html.Div([
-        html.H6("Customer Selection"),
-        html.Div(["Id: ",
-              dcc.Input(id='customer-id', value=0, type='number'),
-              dcc.Graph(figure=coef_fig)]),
+        html.Div([
+            html.H6("Customer Selection"),
+            html.Div(["Id: ",
+                  dcc.Input(id='customer-id', value=0, type='number')
+                  ]),
+    ],
+    style={'width': '48%', 'display': 'inline-block'}),
+    html.Div([
+        dcc.Graph(figure=coef_fig),
+    ],
+    style={'width': '48%', 'display': 'inline-block'}),
 
         html.Div([
             dcc.Dropdown(
@@ -93,7 +100,7 @@ app.layout = html.Div([
 
     dcc.Graph(id='indicator-graphic'),
 
-   dcc.Graph(id='indicator-graphic2')
+    dcc.Graph(id='indicator-graphic2')
 
 ])
 
