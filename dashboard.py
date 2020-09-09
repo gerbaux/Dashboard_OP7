@@ -101,12 +101,7 @@ app.layout = html.Div([
                 options=[{'label': i, 'value': i} for i in available_features],
                 value='EXT_SOURCE_1'
             ),
-            dcc.Slider(
-                id='xy-range-slider',
-                min=0,
-                max=100,
-                value=20
-            )
+            dcc.Graph(id='xaxis-distribution')
 
         ],
         style={'width': '48%', 'display': 'inline-block'}),
@@ -116,14 +111,18 @@ app.layout = html.Div([
                 id='yaxis-column',
                 options=[{'label': i, 'value': i} for i in available_features],
                 value='EXT_SOURCE_2'
-            )
+            ),
+            dcc.Graph(id='yaxis-distribution')
         ],style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
 
     dcc.Graph(id='indicator-graphic'),
-
-    dcc.Graph(id='indicator-graphic2')
-
+    dcc.Slider(
+                id='xy-range-slider',
+                min=0,
+                max=100,
+                value=20
+    ),
 ])
 
 @app.callback(
@@ -147,7 +146,7 @@ def update_graph(nbFeatures,
 
 
 @app.callback(
-    Output('indicator-graphic2', 'figure'),
+    Output('xaxis-distribution', 'figure'),
     [Input('xaxis-column', 'value'),
      Input('customer-id', 'value')])
 def update_graph(xaxis_column_name,
@@ -163,16 +162,45 @@ def update_graph(xaxis_column_name,
     fig.update_layout(shapes=[
         dict(
             type= 'line',
-            yref= 'paper', 
-            y0= dff[xaxis_column_name].min(), 
+            yref= 'paper',
+            y0= dff[xaxis_column_name].min(),
             y1= dff[xaxis_column_name].max(),
-            xref= 'x', 
-            x0= dff.iloc[customerId][xaxis_column_name], 
+            xref= 'x',
+            x0= dff.iloc[customerId][xaxis_column_name],
             x1= dff.iloc[customerId][xaxis_column_name],
         )]
     )
-    
+
     return fig
+
+@app.callback(
+    Output('yaxis-distribution', 'figure'),
+    [Input('yaxis-column', 'value'),
+     Input('customer-id', 'value')])
+def update_graph(yaxis_column_name,
+                 customerId):
+    dff = DashBoardDF[[yaxis_column_name, 'Predict']].dropna()
+    hist_data = [dff[dff['Predict'] == 1][yaxis_column_name], \
+                 dff[dff['Predict'] == 0][yaxis_column_name]]
+    group_labels = ['Default', 'Success']
+    colors = ['red', 'blue']
+    fig = ff.create_distplot(hist_data, group_labels,
+                             show_hist=False, colors=colors,
+                             show_rug=False)
+    fig.update_layout(shapes=[
+        dict(
+            type= 'line',
+            yref= 'paper',
+            y0= dff[yaxis_column_name].min(),
+            y1= dff[yaxis_column_name].max(),
+            xref= 'x',
+            x0= dff.iloc[customerId][yaxis_column_name],
+            x1= dff.iloc[customerId][yaxis_column_name],
+        )]
+    )
+
+    return fig
+
 
 @app.callback(
     Output('indicator-graphic', 'figure'),
