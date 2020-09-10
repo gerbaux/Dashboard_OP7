@@ -222,6 +222,7 @@ def update_graph(xaxis_column_name,
     fig = ff.create_distplot(hist_data, group_labels,
                              show_hist=False, colors=colors,
                              show_rug=False)
+    title="{} Feature Distribution".format(xaxis_column_name)
     fig.update_layout(shapes=[
         dict(
             type= 'line',
@@ -231,7 +232,11 @@ def update_graph(xaxis_column_name,
             xref= 'x',
             x0= dff.iloc[customerId][xaxis_column_name],
             x1= dff.iloc[customerId][xaxis_column_name],
-        )]
+        )],
+        title=title,
+        margin=dict(l=20, r=20, t=40, b=20),
+        width=400, height=200,
+        paper_bgcolor="LightSteelBlue",
     )
 
     return fig
@@ -250,6 +255,7 @@ def update_graph(yaxis_column_name,
     fig = ff.create_distplot(hist_data, group_labels,
                              show_hist=False, colors=colors,
                              show_rug=False)
+    title="{} Feature Distribution".format(yaxis_column_name)
     fig.update_layout(shapes=[
         dict(
             type= 'line',
@@ -259,7 +265,11 @@ def update_graph(yaxis_column_name,
             xref= 'x',
             x0= dff.iloc[customerId][yaxis_column_name],
             x1= dff.iloc[customerId][yaxis_column_name],
-        )]
+        )],
+        title=title,
+        margin=dict(l=20, r=20, t=40, b=20),
+        width=400, height=200,
+        paper_bgcolor="LightSteelBlue",
     )
 
     return fig
