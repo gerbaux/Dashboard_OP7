@@ -103,7 +103,8 @@ app.layout = html.Div([
         html.Div([
             html.H6("Customer Selection"),
             html.Div(["Id: ",
-                  dcc.Input(id='customer-id', value=0, type='number')
+                  dcc.Input(id='customer-id', value=0, 
+                            min=0, max=DashBoardDF.shape[0], type='number')
                   ],
                   style={'width': '48%', 'display': 'inline-block'}),
                   html.Div([dcc.Graph(id='proba-score')
