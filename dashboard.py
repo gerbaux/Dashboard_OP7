@@ -106,9 +106,9 @@ app.layout = html.Div([
                   dcc.Input(id='customer-id', value=0, type='number')
                   ],
                   style={'width': '48%', 'display': 'inline-block'}),
-                  html.Div(["Nb Features: ",
-                    dcc.Input(id='nb-features', value=12, type='number')
+                  html.Div([dcc.Graph(id='proba-score')
                   ], style={'width': '48%', 'display': 'inline-block'}),
+
                   html.Div([
                     dcc.Graph(id='feature-graphic1')],
                     style={'width': '100%', 'display': 'inline-block'}),
@@ -119,7 +119,6 @@ app.layout = html.Div([
         dcc.Graph(figure=coef_fig),
     ],
     style={'width': '48%', 'display': 'inline-block'}),
-    dcc.Graph(id='proba-score'),
 
         html.Div([
             # dcc.Dropdown(
@@ -160,11 +159,9 @@ app.layout = html.Div([
 
 @app.callback(
     Output('feature-graphic1', 'figure'),
-    [Input('nb-features', 'value'),
-     Input('customer-id', 'value')])
-def update_graph(nbFeatures,
-                 customerId):
-    FeatureNames, FeatureShapValues, colors = getCustomerFeatures(customerId, nbFeatures)
+    [Input('customer-id', 'value')])
+def update_graph(customerId):
+    FeatureNames, FeatureShapValues, colors = getCustomerFeatures(customerId)
     cust_coef_fig = px.bar(
         y=FeatureNames,
         x=FeatureShapValues,
@@ -202,7 +199,7 @@ def update_graph(customerId):
     fig.update_layout(
         title="Prediction Distribution",
         margin=dict(l=20, r=20, t=40, b=20),
-        width=1200, height=150,
+        width=600, height=150,
         paper_bgcolor="LightSteelBlue",
     )
 
