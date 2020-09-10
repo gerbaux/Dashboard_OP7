@@ -83,10 +83,12 @@ coef_fig = px.bar(
     y=[x[0] for x in reversed(listFeaturesI[:NbFeatures])],
     x=[x[1] for x in reversed(listFeaturesI[:NbFeatures])],
     orientation="h",
-#    color=X_test.columns.isin(num_cols),
-    labels={"color": "Is numerical", "x": "Weight on Prediction", "y": "Features"},
+    labels={"x": "Weight on Prediction", "y": "Features"},
     title="Mean Feature Importance",
 )
+coef_fig.update_traces(marker_color='orange')
+coef_fig.update_layout(width=700, height=300, bargap=0.05,
+                       margin=dict(l=100, r=100, t=50, b=50))
 
 # Data for probability distribution
 NbBins = 500
@@ -109,7 +111,7 @@ app.layout = html.Div([
                   ], style={'width': '48%', 'display': 'inline-block'}),
                   html.Div([
                     dcc.Graph(id='feature-graphic1')],
-                    style={'width': '90%', 'display': 'inline-block'}),
+                    style={'width': '100%', 'display': 'inline-block'}),
 
     ],
     style={'width': '48%', 'display': 'inline-block'}),
@@ -169,9 +171,11 @@ def update_graph(nbFeatures,
         orientation="h",
 #        color=colors,
         labels={"x": "Weight on Prediction", "y": "Features"},
-#        marker={'color' : colors},
         title="Customer Feature Importance",
     )
+    cust_coef_fig.update_traces(marker_color=colors)
+    cust_coef_fig.update_layout(width=700, height=300, bargap=0.05,
+                                margin=dict(l=100, r=100, t=50, b=50))
 
     return cust_coef_fig
 
@@ -195,6 +199,12 @@ def update_graph(customerId):
     fig.add_trace(go.Scatter(x=[Score], y=[dist[rank]], mode='markers',
                              marker=dict(size=15, color='black'),
                              name='Customer'))
+    fig.update_layout(
+        title="Prediction Distribution",
+        margin=dict(l=20, r=20, t=40, b=20),
+        width=1200, height=150,
+        paper_bgcolor="LightSteelBlue",
+    )
 
     return fig
 
