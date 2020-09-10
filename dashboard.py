@@ -102,11 +102,16 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.H6("Customer Selection"),
-            html.Div(["Id: ",
-                  dcc.Input(id='customer-id', value=0, 
-                            min=0, max=DashBoardDF.shape[0], type='number')
-                  ],
-                  style={'width': '48%', 'display': 'inline-block'}),
+            html.Div([
+                   html.P("Custumer Id: "),
+                   dbc.Input(id="customer-id", value=0, type="number", min=0, max=DashBoardDF.shape[0]),
+                   dbc.Card(
+                     [
+                        html.H3(id='cust-answer', className="card-title"),
+                        html.H6(id='cust-score', className="card-title"),
+                     ]),
+                   html.Br(),
+                  ], style={'width': '48%', 'display': 'inline-block'}),
                   html.Div([dcc.Graph(id='proba-score')
                   ], style={'width': '48%', 'display': 'inline-block'}),
 
@@ -177,6 +182,20 @@ def update_graph(customerId):
 
     return cust_coef_fig
 
+@app.callback(
+    Output('cust-answer', 'children'),
+    [Input('customer-id', 'value')])
+def update_score(customerId):
+    Score = DashBoardDF.loc[customerId, 'Proba']
+    Answer = 'Accepted' if Score <= Threshold else 'Refused'
+    return f"{Answer}"
+
+@app.callback(
+    Output('cust-score', 'children'),
+    [Input('customer-id', 'value')])
+def update_score(customerId):
+    Score = DashBoardDF.loc[customerId, 'Proba']
+    return f"Score: {Score:.2f}"
 
 @app.callback(
     Output('proba-score', 'figure'),
