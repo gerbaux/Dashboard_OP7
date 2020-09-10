@@ -85,7 +85,7 @@ coef_fig = px.bar(
     orientation="h",
 #    color=X_test.columns.isin(num_cols),
     labels={"color": "Is numerical", "x": "Weight on Prediction", "y": "Features"},
-    title="Global Feature Importance",
+    title="Mean Feature Importance",
 )
 
 # Data for probability distribution
@@ -95,7 +95,6 @@ dist = pd.cut(DashBoardDF['Proba'], bins=NbBins).value_counts()
 dist.sort_index(inplace=True)
 ticks = np.linspace(0, 1, NbBins)
 DashBoradTH=int(Threshold*len(dist))
-
 
 app.layout = html.Div([
     html.Div([
@@ -217,8 +216,8 @@ def update_graph(xaxis_column_name,
         dict(
             type= 'line',
             yref= 'paper',
-            y0= dff[xaxis_column_name].min(),
-            y1= dff[xaxis_column_name].max(),
+            y0= 0,
+            y1= 1,
             xref= 'x',
             x0= dff.iloc[customerId][xaxis_column_name],
             x1= dff.iloc[customerId][xaxis_column_name],
@@ -245,8 +244,8 @@ def update_graph(yaxis_column_name,
         dict(
             type= 'line',
             yref= 'paper',
-            y0= dff[yaxis_column_name].min(),
-            y1= dff[yaxis_column_name].max(),
+            y0= 0,
+            y1= 1,
             xref= 'x',
             x0= dff.iloc[customerId][yaxis_column_name],
             x1= dff.iloc[customerId][yaxis_column_name],
