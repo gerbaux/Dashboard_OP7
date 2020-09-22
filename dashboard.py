@@ -15,7 +15,7 @@ import json
 from sklearn.externals import joblib
 import dash_bootstrap_components as dbc
 
-from utils import *
+from utils import utils
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -25,36 +25,9 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 lGBMclf = joblib.load('LGBM_BestNF.pkl')
 
 DashBoardDF = pd.read_csv("featureDF1K.csv")
-shapValues1 = np.load("shapValues1K.npy")
-
-# with open('dtypes.txt') as json_file:
-    # dtypesR = json.load(json_file)
-    
-# df = pd.read_csv("code/FeatureDF.csv", dtype=dtypesR)
-# def cleanKaggleTest(df):
-    # train_df = df[df['TARGET'].notnull()]
-    # test_df = df[df['TARGET'].isnull()]
-    # del df
-    # gc.collect()
-    # return train_df, test_df
-
-# df, testDF = cleanKaggleTest(df)
-# del testDF
-# gc.collect()
+shapValues1 = np.load("shapValues10K.npy")
 
 available_features = DashBoardDF.columns
-
-def OptionMenu(values, label, **kwargs):
-    options = [{"label": s.replace("_", " ").capitalize(), "value": s} for s in values]
-    kwargs["value"] = kwargs.get("value", values[0])
-
-    if len(options) <= 4:
-        component = dbc.RadioItems
-        kwargs["inline"] = True
-    else:
-        component = dbc.Select
-
-    return dbc.FormGroup([dbc.Label(label), component(options=options, **kwargs)])
 
 def getCustomerFeatures(CustId, NbFeatures = 12):
     maxFeatureId = sorted(range(len(shapValues1[CustId])),
@@ -132,7 +105,7 @@ app.layout = html.Div([
                 # options=[{'label': i, 'value': i} for i in available_features],
                 # value='EXT_SOURCE_1'
             # ),
-            OptionMenu(id="xaxis-column", label="X axis", values=available_features,
+            utils.OptionMenu(id="xaxis-column", label="X axis", values=available_features,
                        value='EXT_SOURCE_1'),
             dcc.Graph(id='xaxis-distribution')
 
@@ -145,7 +118,7 @@ app.layout = html.Div([
                 # options=[{'label': i, 'value': i} for i in available_features],
                 # value='EXT_SOURCE_2'
             # ),
-            OptionMenu(id="yaxis-column", label="Y axis", values=available_features,
+            utils.OptionMenu(id="yaxis-column", label="Y axis", values=available_features,
                        value='EXT_SOURCE_2'),
             dcc.Graph(id='yaxis-distribution')
         ],style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
