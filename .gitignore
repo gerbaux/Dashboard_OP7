@@ -1,0 +1,3 @@
+.gitignore
+utils/__pycache__
+featureDF10K.csv
