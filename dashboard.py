@@ -18,7 +18,7 @@ import dash_bootstrap_components as dbc
 from utils import utils
 from utils import preprocess
 
-Threshold = 0.145
+Threshold = 0.276229
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
