@@ -27,10 +27,15 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 # load model
 lGBMclf = joblib.load('LGBM_BestNF.pkl')
 
+# Building the pre-processed data during the first time the Dashboard is launched
+# For next runs of the dashboard, the csv file featureDF10K.csv will be read directly
 if not os.path.isfile('featureDF10K.csv'):
     preprocess.BuildDataFromZipFile(lGBMclf, Threshold)
 
 DashBoardDF = pd.read_csv("featureDF10K.csv")
+
+# Reading rhe Shap values that have been preprocessed earlier.
+# Could be put in preprocessing step BuildDataFromZipFile as well
 shapValues1 = np.load("shapValues10K.npy")
 
 available_features = DashBoardDF.columns
@@ -53,6 +58,7 @@ def getCustomerFeatures(CustId, NbFeatures = 12):
 def sortSecond(val):
     return val[1]
 
+# Building the list of 12 most important features to be reported in a figure
 NbFeatures = 12
 listFeaturesI = [(x, int(y)) for x,y in zip(DashBoardDF.columns,lGBMclf.feature_importances_)]
 listFeaturesI.sort(key = sortSecond, reverse=True)
@@ -76,6 +82,7 @@ dist.sort_index(inplace=True)
 ticks = np.linspace(0, 1, NbBins)
 DashBoradTH=int(Threshold*len(dist))
 
+# Layout of the Dashboard
 app.layout = html.Div([
     html.Div([
         html.Div([
@@ -141,6 +148,9 @@ app.layout = html.Div([
              style={'width': '48%', 'display': 'inline-block'}),
 ])
 
+# Callbacks functions
+
+# Callback for the customer feature importance
 @app.callback(
     Output('feature-graphic1', 'figure'),
     [Input('customer-id', 'value')])
@@ -160,6 +170,7 @@ def update_graph(customerId):
 
     return cust_coef_fig
 
+# Callback for the prediction and score of the selected customer
 @app.callback(
     Output('cust-answer', 'children'),
     [Input('customer-id', 'value')])
@@ -175,6 +186,7 @@ def update_score(customerId):
     Score = DashBoardDF.loc[customerId, 'Proba']
     return f"Score: {Score:.2f}"
 
+# Callback for the probability distribution 
 @app.callback(
     Output('proba-score', 'figure'),
     [Input('customer-id', 'value')])
@@ -203,6 +215,7 @@ def update_graph(customerId):
 
     return fig
 
+# Callback for the X axis feature distribution for accepted and refused customers 
 @app.callback(
     Output('xaxis-distribution', 'figure'),
     [Input('xaxis-column', 'value'),
@@ -236,6 +249,7 @@ def update_graph(xaxis_column_name,
 
     return fig
 
+# Callback for the Y axis feature distribution for accepted and refused customers 
 @app.callback(
     Output('yaxis-distribution', 'figure'),
     [Input('yaxis-column', 'value'),
@@ -270,6 +284,8 @@ def update_graph(yaxis_column_name,
     return fig
 
 
+# Callback for the scatter figure with neighborhood customers, taking into account
+# the zoom factor
 @app.callback(
     Output('indicator-graphic', 'figure'),
     [Input('xaxis-column', 'value'),
