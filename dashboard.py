@@ -13,7 +13,7 @@ import plotly.figure_factory as ff
 import pandas as pd
 import gc
 import json
-from sklearn.externals import joblib
+import joblib
 import dash_bootstrap_components as dbc
 from utils import utils
 from utils import preprocess
