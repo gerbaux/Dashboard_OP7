@@ -393,12 +393,12 @@ def BuildDataFromZipFile(lGBMclf, BestThreshold):
     # don't fill NA for Dashboard
     feats = [f for f in df.columns if f not in [
             'TARGET', 'SK_ID_CURR', 'SK_ID_BUREAU', 'SK_ID_PREV', 'index']]
-    DashBoardDF = pd.DataFrame(df[0:10000][feats].copy(), columns=feats)
+    DashBoardDF = pd.DataFrame(df[:5000][feats].copy(), columns=feats)
 
     print("filling NA")
     median = load_dict('median.pkl')
     df = df.fillna(median)
-    df = pd.DataFrame(np.nan_to_num(df[0:10000]), columns=df.columns)
+    df = pd.DataFrame(np.nan_to_num(df[:5000]), columns=df.columns)
 
     print("scaling", df.shape)
     trainXDF = pd.DataFrame(scaler.transform(df[feats]), columns=feats)
