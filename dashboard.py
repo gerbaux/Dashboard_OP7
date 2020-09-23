@@ -29,14 +29,14 @@ lGBMclf = joblib.load('LGBM_BestNF.pkl')
 
 # Building the pre-processed data during the first time the Dashboard is launched
 # For next runs of the dashboard, the csv file featureDF10K.csv will be read directly
-if not os.path.isfile('featureDF10K.csv'):
+if not os.path.isfile('featureDF5K.csv'):
     preprocess.BuildDataFromZipFile(lGBMclf, Threshold)
 
-DashBoardDF = pd.read_csv("featureDF10K.csv")
+DashBoardDF = pd.read_csv("featureDF5K.csv")
 
 # Reading rhe Shap values that have been preprocessed earlier.
 # Could be put in preprocessing step BuildDataFromZipFile as well
-shapValues1 = np.load("shapValues10K.npy")
+shapValues1 = np.load("shapValues5K.npy")
 
 available_features = DashBoardDF.columns
 
