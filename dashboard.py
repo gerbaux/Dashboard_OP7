@@ -1,6 +1,7 @@
 # Run this app with `python app.py` and
 # visit http://127.0.0.1:8050/ in your web browser.
 
+import os
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -14,8 +15,10 @@ import gc
 import json
 from sklearn.externals import joblib
 import dash_bootstrap_components as dbc
-
 from utils import utils
+from utils import preprocess
+
+Threshold = 0.145
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -24,7 +27,10 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 # load model
 lGBMclf = joblib.load('LGBM_BestNF.pkl')
 
-DashBoardDF = pd.read_csv("featureDF1K.csv")
+if not os.path.isfile('featureDF10K.csv'):
+    preprocess.BuildDataFromZipFile(lGBMclf, Threshold)
+
+DashBoardDF = pd.read_csv("featureDF10K.csv")
 shapValues1 = np.load("shapValues10K.npy")
 
 available_features = DashBoardDF.columns
@@ -65,7 +71,6 @@ coef_fig.update_layout(width=700, height=300, bargap=0.05,
 
 # Data for probability distribution
 NbBins = 500
-Threshold = 0.145
 dist = pd.cut(DashBoardDF['Proba'], bins=NbBins).value_counts()
 dist.sort_index(inplace=True)
 ticks = np.linspace(0, 1, NbBins)
