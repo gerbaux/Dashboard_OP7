@@ -393,12 +393,12 @@ def BuildDataFromZipFile(lGBMclf, BestThreshold):
     # don't fill NA for Dashboard
     feats = [f for f in df.columns if f not in [
             'TARGET', 'SK_ID_CURR', 'SK_ID_BUREAU', 'SK_ID_PREV', 'index']]
-    DashBoardDF = pd.DataFrame(df[:5000][feats].copy(), columns=feats)
+    DashBoardDF = pd.DataFrame(df[:2000][feats].copy(), columns=feats)
 
     print("filling NA")
     median = load_dict('median.pkl')
     df = df.fillna(median)
-    df = pd.DataFrame(np.nan_to_num(df[:5000]), columns=df.columns)
+    df = pd.DataFrame(np.nan_to_num(df[:2000]), columns=df.columns)
 
     print("scaling", df.shape)
     trainXDF = pd.DataFrame(scaler.transform(df[feats]), columns=feats)
@@ -411,7 +411,7 @@ def BuildDataFromZipFile(lGBMclf, BestThreshold):
 
     # Saving the Dashboard to avoid redoing the preprocessing for next runs of dashboard
     # If this file is not present, preprocessing from zip file will be done
-    DashBoardDF.to_csv("featureDF10K.csv", index= False)
+    DashBoardDF.to_csv("featureDF2K.csv", index= False)
 
     # Removing uncompressed CSV files as they are not usefull anymore
     if os.path.isdir('input'):
